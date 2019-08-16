@@ -1,0 +1,57 @@
+#!/usr/bin/env groovy
+
+pipeline {
+    agent none
+        parameters {
+            choice(
+                name: 'UseCase',
+                choices:"Developer\nTester",
+                description: "Choose a Use Case")
+            choice(
+                name: 'Format',
+                choices:"Large\nSmall",
+                description: "Choose Format to Bu")
+       
+            choice(
+                name: 'Organization',
+                choices:"development\nstaging",
+                description: "Select the required Organization" )
+            choice(
+                name: 'Chef_Client_Ver',
+                choices:"14.2.0\n13.10.0",
+                description: "Where to put the build!")
+    }
+    stages {
+        stage("Prepare") {
+            steps {
+            echo "Printing the params ${params.UseCase}"
+            echo "Printing the params ${params.Format}
+            echo "Printing the params ${params.Organization}"
+            echo "Printing the params ${params.Chef_Client_Ver}"
+                       }
+        }
+        stage("Build1") {
+    when {
+        expression {
+        return params.UseCase != 'Tester';
+        }
+    }
+            steps {
+                script {
+                    build(job: "ABC",
+                        parameters:
+                        [string(name: 'Node', value: "${params.Format}")])
+                }
+            }
+        }
+        stage("Build2") {
+            steps {
+            echo "Printing the params ${params.UseCase}"
+            echo "Printing the params ${params.Format}"
+            echo "Printing the params ${params.Organization}"
+            echo "Printing the params ${params.Chef_Client_Ver}"
+                       }
+        }
+
+    }
+}
