@@ -1,0 +1,112 @@
+pipeline 
+{
+    agent {
+    		label 'master'
+	    }
+	    stages {
+            stage('Set Working Directory') {
+                steps {
+                    script {
+                        def dir = pwd()    // present working directory is good enough for now as this is also the jenkins working directory/scratch space.
+                        echo '--------------- Current working directory is : ' + dir
+                        }
+                }
+            }
+		stage('Checkout from Git') {
+            steps{
+				script {
+                    echo '--------------- Get CSV from Git.'
+                    dir ('CSVs') {
+		               git credentialsId: 'GitHub credentialsId', url: "GitHub Link"
+					}
+				}	
+			}
+		}
+		stage('Parse the CSV and trigger build') {
+            steps {
+                script {      
+                    dir ('CSVs') {
+                        if (fileExists('filename.csv')) {
+                            echo 'filename.csv found'
+                            def branches = [:] 
+                            def Index = 0
+                                                      
+                            readFile("filename.csv").split('\n').each { line, count ->
+                                def fields = line.split(',')
+                                branches["branch${Index}"] = {
+                                    if ( fields[0] == 'First Row-Column Field Name ' ) {
+                                        // Do nothing as we need to skip the Header Row
+                                    } else {
+                                        echo "Sending ----> " + fields[0] + ': ' + fields[1] + ': ' + fields[2] + ': ' ..............+ fields[n];
+					def pre = "abc"
+					def post = "ABC"
+					def final = pre+fields[0]+fields[1]+post
+					println "FINAL ----> " + final
+					def Length = fields[0].length()
+					def cons = "PQR"
+					if(Length == 4) {
+					
+						if(fields[0].isNumber()){
+						
+						if(fields[4]=="ABC" || fields[4]=="abc") {
+						
+						if(fields[2]=="PQR" || fields[2]=="pqr") {
+						
+							if(fields[1] == "abc"){
+						
+								def a = "a"
+								def A = "A"
+							
+								build job: 'Job Name to be Triggered', wait: false, parameters: [
+								[$class: 'StringParameterValue', name: 'final', value: "${final}"],
+								[$class: 'StringParameterValue', name: 'P', value: "${fields[2]}"],
+								[$class: 'StringParameterValue', name: 'Q', value: "${fields[3]}"],
+								[$class: 'StringParameterValue', name: 'R', value: "${fields[4]}"],
+								[$class: 'StringParameterValue', name: 'S', value: "${fields[5]}"],
+								[$class: 'StringParameterValue', name: 'cons', value: "${cons}"],
+								[$class: 'StringParameterValue', name: 'a', value: "${a}"],
+								[$class: 'StringParameterValue', name: 'A', value: "${A}"],
+					]
+					} else if (fields[1] == "ABC") {
+						
+							def b = "b"
+							def B = "B"
+							
+                            build job: 'Job Name to be Triggered', wait: false, parameters: [
+								[$class: 'StringParameterValue', name: 'final', value: "${final}"],
+								[$class: 'StringParameterValue', name: 'P', value: "${fields[2]}"],
+								[$class: 'StringParameterValue', name: 'Q', value: "${fields[3]}"],
+								[$class: 'StringParameterValue', name: 'R', value: "${fields[4]}"],
+								[$class: 'StringParameterValue', name: 'S', value: "${fields[5]}"],
+								[$class: 'StringParameterValue', name: 'cons', value: "${cons}"],
+								[$class: 'StringParameterValue', name: 'b', value: "${b}"],
+								[$class: 'StringParameterValue', name: 'B', value: "${B}"],
+					]
+						
+					}
+					else {
+						print "Enter Correct details, hence not triggering Job -----> " + final
+						}
+					} else {
+						print "Enter Correct details, hence not triggering Job -----> " + final
+					}} else {
+						print "Enter Correct details, hence not triggering Job -----> " + final
+					}} else {
+						print "Enter Correct details, hence not triggering Job -----> " + final
+					}} else {
+						print "Enter Correct details, hence not triggering Job -----> " + final
+					}
+                                    }
+                                }
+                                Index++;
+                            }
+                            parallel branches                            
+                        } else {
+                                echo 'filename.csv Not found. Failing.'
+                        }
+		   }
+               }
+            }
+	}
+     }   
+}
